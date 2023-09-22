@@ -24,6 +24,10 @@ except:
     print("Connection refused")
     sys.exit()
 
+# Prompt the user for their name
+name = input("Enter your name: ")
+server.send(name.encode())  # Send the chosen name to the server
+
 while True:
     sockets_list = [sys.stdin, server]
     read_sockets, write_socket, error_socket = select.select(sockets_list, [], [])
