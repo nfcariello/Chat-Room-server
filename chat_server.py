@@ -4,14 +4,9 @@ from threading import Thread
 import argparse
 
 
-def get_default_ip():
-    # Get the default IP address of the machine
-    return socket.gethostbyname(socket.gethostname())
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Chat server")
-    parser.add_argument('--ip', type=str, default=get_default_ip(), help="IP address to bind to (default: IP of the machine)")
+    parser.add_argument('ip', type=str, help="IP address of the machine hosting the server")
     parser.add_argument('--port', type=int, default=5000, help="Port number to listen on (default: 5000)")
     return parser.parse_args()
 
@@ -31,7 +26,7 @@ list_of_clients = []
 
 
 def client_thread(conn, addr):
-    conn.send("Welcome to this chatroom!")
+    conn.send("Welcome to this chatroom!".encode())
     while True:
         try:
             message = conn.recv(2048)

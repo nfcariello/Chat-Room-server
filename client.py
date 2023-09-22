@@ -36,6 +36,7 @@ while True:
             server.send(message.encode())
             sys.stdout.write("<You> ")
             sys.stdout.write(message)
+            sys.stdout.write("\n")
             sys.stdout.flush()
 
 server.close()
