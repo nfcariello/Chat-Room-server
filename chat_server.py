@@ -1,7 +1,14 @@
+import os
 import socket
 import select
 from threading import Thread
 import argparse
+import datetime
+
+
+def create_logs_folder():
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
 
 
 def parse_args():
@@ -10,6 +17,8 @@ def parse_args():
     parser.add_argument('--port', type=int, default=5000, help="Port number to listen on (default: 5000)")
     return parser.parse_args()
 
+
+create_logs_folder()  # Create the "logs" folder if it doesn't exist
 
 args = parse_args()
 
@@ -21,19 +30,39 @@ Port = args.port
 
 server.bind((IP_address, Port))
 print("Chat Server started on " + IP_address + ":" + str(Port))
-server.listen(100)  # 100 is the maximum number of connections
+server.listen(100)
 list_of_clients = []
+
+# Generate a timestamp for the log file name
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+log_file_name = os.path.join("logs", f"chat_log_{timestamp}.txt")  # Use os.path.join to specify the folder
+
+# Open a new log file for writing
+log_file = open(log_file_name, "a")
+
+
+def log_entry(message):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = f"{timestamp} {message}\n"
+    print(log_message)
+    log_file.write(log_message)
+    log_file.flush()
 
 
 def client_thread(conn, addr):
-    name = conn.recv(2048).decode()  # Receive the client's chosen name
-    welcome_message = f"Welcome to this chatroom, {name}!"  # Include the client's name in the welcome message
-    conn.send(welcome_message.encode())  # Send the welcome message to the client
+    name = conn.recv(2048).decode()
+    log_entry(f"User '{name}' joined from {addr[0]}")
+    welcome_message = f"Welcome to this chatroom, {name}!"
+    conn.send(welcome_message.encode())
     while True:
         try:
             message = conn.recv(2048)
             if message:
-                print("<" + name + "> " + message.decode())  # Display the client's name
+                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                log_message = f"{timestamp} <{name}> {message.decode()}\n"
+                print(log_message)
+                log_file.write(log_message)
+                log_file.flush()
                 message_to_send = "<" + name + "> " + message.decode()
                 broadcast(message_to_send.encode(), conn)
             else:
