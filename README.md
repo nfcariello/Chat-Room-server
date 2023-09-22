@@ -1,4 +1,8 @@
 # Chat-Room-server
+A simple chat room server and client written in Python.
+
+## Requirements
+* Python 3.6 or higher
 
 # Start A Chat Server
 1. Start the server by running the following command in the terminal:
